@@ -152,9 +152,9 @@ http://opensource.org/licenses/MIT
 <script src="https://scratchblocks.github.io/js/translations-all-v3.3-min.js"></script>
 
 <script>
-window.onerror = function(msg, url, line, col, error) {
-  alert("There was an error — " + error)
-return false
+window.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
+    alert("Error occured: " + errorMsg);//or any message
+    return false;
 }
 var current_id,
   selected_sprite,
