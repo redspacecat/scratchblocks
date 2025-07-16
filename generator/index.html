@@ -13,6 +13,7 @@ http://opensource.org/licenses/MIT
 -->
 
 <link rel=stylesheet href="//fonts.googleapis.com/css?family=Noto+Sans:400,700">
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1"></script>
 <link rel="stylesheet" href="../style.css">
 
 <!---------------------------------------------------------------------------->
@@ -147,8 +148,8 @@ http://opensource.org/licenses/MIT
 
 <!---------------------------------------------------------------------------->
 
-<script src="/js/scratchblocks-v3.3-min.js"></script>
-<script src="/js/translations-all-v3.3-min.js"></script>
+<script src="https://scratchblocks.github.io/js/scratchblocks-v3.3-min.js"></script>
+<script src="https://scratchblocks.github.io/js/translations-all-v3.3-min.js"></script>
 
 <script>
 var current_id,
@@ -173,11 +174,13 @@ function id_from_url (url) {
   return id;
 }
 
-function fetchProject(id) {
-  projectInput.value = "http://scratch.mit.edu/projects/"+id
+async function fetchProject(id) {
+  projectInput.value = "https://scratch.mit.edu/projects/"+id
   current_id = id;
 
-  var url = "https://projects.scratch.mit.edu/" + id + "";
+  let r = await fetch("https://trampoline.turbowarp.org/api/projects/" + id)
+  let token = (await r.json()).project_token
+  var url = "https://projects.scratch.mit.edu/" + id + "?token=" + token;
 
   clear_project();
 
@@ -185,16 +188,15 @@ function fetchProject(id) {
 
   statusLabel.textContent = "Fetching...";
 
-  fetch(url, {
-  }).then(function(response) {
-    return response.text()
-  }).then(function(text) {
-    var isLegacy = /^ScratchV01/.test(text)
+  let response = await fetch(url)
+  var zip = new JSZip();
+  let newZip = await zip.loadAsync(await response.arrayBuffer())
+    let text = await newZip.file("project.json").async("string")
+    var json = JSON.parse(text)
+  var isLegacy = /^ScratchV01/.test(text)
     if (isLegacy) {
       throw "Scratch 1.4 projects not supported"
     }
-
-    var json = JSON.parse(text)
     window.project = json; // DEBUG
 
     statusLabel.textContent = "Loading...";
@@ -202,13 +204,6 @@ function fetchProject(id) {
     statusLabel.textContent = "Done!";
     fetching = false;
     projectInput.blur();
-  })
-    /*.catch(function(err) {
-    statusLabel.textContent = "Error: "+err;
-    fetching = false;
-    check_hash();
-    projectInput.focus();
-  });*/
 }
 
 function clear_project () {
