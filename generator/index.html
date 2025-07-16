@@ -195,7 +195,8 @@ try {
   let newZip = await zip.loadAsync(await response.arrayBuffer())
     text = await newZip.file("project.json").async("string")
 } catch {
-  text = await response.text()
+  let response2 = await fetch(url)
+  text = await response2.text()
 }
     var json = JSON.parse(text)
   var isLegacy = /^ScratchV01/.test(text)
