@@ -152,7 +152,9 @@ http://opensource.org/licenses/MIT
 <script src="https://scratchblocks.github.io/js/translations-all-v3.3-min.js"></script>
 
 <script>
-try {
+window.onerror = function(msg, url, line, col, error) {
+  alert("There was an error — " + error)
+}
 var current_id,
   selected_sprite,
   sprites,
@@ -484,7 +486,4 @@ projectInput.focus() //.val(projectInput.val()); // set cursor to end
 clear_project(); // make sure we start fresh
 
 check_hash();
-} catch (e) {
-alert("There was an error — " + e)
-}
 </script>
