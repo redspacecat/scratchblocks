@@ -190,8 +190,13 @@ async function fetchProject(id) {
 
   let response = await fetch(url)
   var zip = new JSZip();
+let text
+try {
   let newZip = await zip.loadAsync(await response.arrayBuffer())
-    let text = await newZip.file("project.json").async("string")
+    text = await newZip.file("project.json").async("string")
+} catch {
+  text = await response.text()
+}
     var json = JSON.parse(text)
   var isLegacy = /^ScratchV01/.test(text)
     if (isLegacy) {
